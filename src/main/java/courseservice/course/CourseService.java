@@ -1,31 +1,27 @@
 package courseservice.course;
 
+import courseservice.exceptions.UserNotLoggedInException;
+import courseservice.user.User;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import courseservice.exceptions.UserNotLoggedInException;
-import courseservice.user.User;
-import courseservice.user.UserSession;
-
 public class CourseService {
-	public List<Course> getCoursesByUser(User user) throws UserNotLoggedInException {
-		List<Course> courseList = new ArrayList<>();
-		User loggedUser = UserSession.getInstance().getLoggedUser();
-		boolean isFriend = false;
+	private ICourseDAO dao;
 
-		if (loggedUser != null) {
-			for (User friend : user.getFriends()) {
-				if (friend.equals(loggedUser)) {
-					isFriend = true;
-					break;
-				}
-			}
-			if (isFriend) {
-				courseList = CourseDAO.findCoursesByUser(user);
-			}
-			return courseList;
-		} else {
+	public CourseService(ICourseDAO dao) {
+		this.dao = dao;
+	}
+
+	public List<Course> getCoursesByUser(User user, User loggedUser) throws UserNotLoggedInException {
+		if (loggedUser == null) {
 			throw new UserNotLoggedInException();
 		}
+		return user.isFriend(loggedUser) ?
+				dao.coursesBy(user) : emptyList();
+	}
+
+	private ArrayList<Course> emptyList() {
+		return new ArrayList<>();
 	}
 }

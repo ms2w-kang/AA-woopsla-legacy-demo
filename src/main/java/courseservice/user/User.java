@@ -12,7 +12,7 @@ public class User {
 	private List<User> friends = new ArrayList<>();
 	
 	public List<User> getFriends() {
-		return friends;
+		return Collections.unmodifiableList(friends);
 	}
 	
 	public void addFriend(User user) {
@@ -27,4 +27,8 @@ public class User {
 		return Collections.unmodifiableList(courses);
 	}
 
+	// Replace Algorithm
+    public boolean isFriend(User user) {
+		return friends.contains(user);
+    }
 }
